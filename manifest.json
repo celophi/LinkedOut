@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Suggested Hider",
+  "description": "Hides LinkedIn feed items that are marked as 'Suggested'. LinkedIn you are cringe enough already.",
+  "version": "0.1.0",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://www.linkedin.com/*",
+    "*://linkedin.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
