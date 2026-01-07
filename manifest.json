@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Suggested Hider",
+  "name": "LinkedOut",
   "description": "Hides LinkedIn feed items that are marked as 'Suggested'. LinkedIn you are cringe enough already.",
   "version": "0.1.0",
   "permissions": [
@@ -19,4 +19,9 @@
       "run_at": "document_idle"
     }
   ]
+  ,
+  "action": {
+    "default_title": "LinkedIn Suggested Hider",
+    "default_popup": "popup.html"
+  }
 }

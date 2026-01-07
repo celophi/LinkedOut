@@ -78,6 +78,22 @@
     }
   }
 
+  // Wrapper to only run behavior when enabled
+  let enabled = true;
+
+  function startBehavior() {
+    scanAll();
+    observer.observe(document.documentElement || document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+
+  function stopBehavior() {
+    try { observer.disconnect(); } catch (e) {}
+  }
+
   // Observe mutations to catch infinite-scroll content
   const observer = new MutationObserver(mutations => {
     for (const m of mutations) {
@@ -90,12 +106,17 @@
   });
 
   function start() {
-    scanAll();
-    observer.observe(document.documentElement || document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
+    // read setting from storage (if available). default = true
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.get({ enabled: true }, (items) => {
+        enabled = items.enabled !== false;
+        if (enabled) startBehavior();
+      });
+    } else {
+      // no storage API available - default enabled
+      enabled = true;
+      startBehavior();
+    }
   }
 
   // Try to start when DOM is ready
@@ -103,6 +124,19 @@
     document.addEventListener('DOMContentLoaded', start);
   } else {
     start();
+  }
+
+  // Listen for toggle messages from popup
+  if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResp) => {
+      if (msg && msg.type === 'enabled-changed') {
+        enabled = !!msg.enabled;
+        stopBehavior(); // always stop first
+        if (enabled) {
+          startBehavior(); // re-scan and observe if enabled
+        }
+      }
+    });
   }
 
 })();
